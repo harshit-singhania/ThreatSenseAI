@@ -1,3 +1,6 @@
 out/
 New_Model/runs/detect/
 *.bin
+
+# Environment Variables
+.env
