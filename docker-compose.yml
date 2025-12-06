@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./FrontEnd
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+      - flaskserver
+
+  backend:
+    build: ./BackEnd
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - MONGODB_URI=mongodb://mongo:27017/threatsense
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      - mongo
+
+  flaskserver:
+    build: ./FlaskServer
+    ports:
+      - "7001:7001"
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

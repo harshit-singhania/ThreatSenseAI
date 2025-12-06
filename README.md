@@ -1,77 +1,73 @@
 # ThreatSenseAI
 
 ThreatSenseAI is a disaster management system designed to assist in mitigating the impact of natural disasters such as earthquakes, wildfires, and floods. 
-The system utilizes advanced machine learning algorithms to analyze images and assess the severity of the disaster, identify the type of disaster, and the number of individuals affected.
+The system utilizes advanced machine learning algorithms to analyze **video footage** and assess the severity of the disaster, identify the type of disaster, and the number of individuals affected.
+
+## Features
+
+- **User Registration:** Secure user registration with MongoDB storage.
+- **Video Analysis:** Upload video footage (MP4, AVI, MOV) for automated analysis.
+- **Real-Time AI Inference:**
+    - **Disaster Classification:** Uses a Vision Transformer (ViT) to detect disasters like Wildfires, Floods, and Earthquakes.
+    - **Person Detection:** Uses **YOLOv8** to detect and count individuals in the danger zone.
+- **Interactive Dashboard:** View analysis results, including disaster type and people count.
 
 ## Project Structure 
 
 The project is divided into three main parts:
-- BackEnd: Contains the backend code for handling user registration and database operations.
-- FlaskServer: Contains the Flask server code for image classification and person detection.
-- FrontEnd: Contains the frontend code for the user interface.
+- **BackEnd:** Node.js Express server for user management and database operations.
+- **FlaskServer:** Python Flask server hosting the AI models (YOLOv8 + ViT).
+- **FrontEnd:** React-based user interface for interaction and visualization.
 
-## Working 
+## Quick Start (Docker)
 
-- **User Registration:** Users can register by providing their name, email, and message. The backend handles the registration and stores the user information in a MongoDB database.
-- **Image Classification:** Users can upload images to the system. The Flask server processes the images using machine learning models to classify the type of disaster and detect the number of people in the image.
-- **Results Display:** The frontend displays the classification results and the number of people detected in the image.
-
-## Installation 
+The easiest way to run the application is using Docker.
 
 ### Prerequisites
+- Docker Desktop installed and running.
 
-- Node.js
-- Python
-- MongoDB
+### Steps
+1. Clone the repository.
+2. Run the following command in the project root:
+   ```bash
+   docker compose up --build
+   ```
+3. Access the application at `http://localhost:5173`.
 
-### Project Setup Instructions
+## Manual Installation 
 
-#### Backend
-1. Navigate to the `BackEnd` directory.
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `BackEnd` directory with the following content:
-   ```env
-   MONGODB_URI=<your_mongodb_uri>
-   CORS_ORIGIN=<your_cors_origin>
-   ```
-4. Start the backend server:
-   ```bash
-   npm run dev
-   ```
+If you prefer to run services individually:
 
-#### Flask Server
-1. Navigate to the `FlaskServer` directory.
-2. Create a virtual environment and activate it:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Start the Flask server:
-   ```bash
-   python app.py
-   ```
+### 1. Backend (Node.js)
+```bash
+cd BackEnd
+npm install
+# Create .env with MONGODB_URI and PORT=8000
+npm run dev
+```
 
-#### Frontend
-1. Navigate to the `FrontEnd` directory.
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the frontend development server:
-   ```bash
-   npm run dev
-   ```
+### 2. Flask Server (Python AI)
+```bash
+cd FlaskServer
+pip install -r requirements.txt
+python app.py
+```
+*Note: The server runs on port 7001.*
 
-## Usage
-1. Open the frontend application in your browser.
-2. Register a new user.
-3. Upload an image for classification.
-4. View the classification results and the number of people detected in the image.
+### 3. Frontend (React)
+```bash
+cd FrontEnd
+npm install
+npm run dev
+```
+*Access at http://localhost:5173*
 
+## AI Models
+- **Person Detection**: `yolov8n.pt` (Ultralytics) - Automatically downloads on first run.
+- **Classification**: `google/vit-base-patch16-224` (Hugging Face Transformers).
+
+## Tech Stack
+- **Frontend**: React, TailwindCSS, Framer Motion
+- **Backend**: Node.js, Express, MongoDB
+- **AI/ML**: Python, Flask, PyTorch, Transformers, OpenCV, YOLOv8
+- **DevOps**: Docker, Docker Compose, Nginx

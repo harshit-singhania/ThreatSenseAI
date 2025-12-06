@@ -2,7 +2,8 @@ import os
 import cv2
 from ultralytics import YOLO
 
-yolo_model_path = './runs/detect/train3/weights/last.pt'
+# Use standard YOLOv8n model (will download automatically)
+yolo_model_path = 'yolov8n.pt'
 yolo_model = YOLO(yolo_model_path)
 
 def resize_image(image, size=(650,400)):
@@ -10,33 +11,38 @@ def resize_image(image, size=(650,400)):
 
 def detect_people(frame):
     results = yolo_model(frame)
-    person_boxes = results.xyxy[0].cpu().numpy()
+    person_boxes = results[0].boxes.xyxy.cpu().numpy()
     return person_boxes
 
 def detect_person_count(image_path):
     frame = cv2.imread(image_path)
-    frame = resize_image(frame, (650,400))
-    threshold = 0.5
-    results = yolo_model(frame)[0]
+    if frame is None:
+        return 0
+    # frame = resize_image(frame, (650,400)) # Optional: resize for speed
+    
+    # Run inference
+    results = yolo_model(frame, verbose=False)[0]
     person_count = 0
 
-    for result in results.boxes.data.tolist():
-        x1, y1, x2, y2, score, class_id = result
+    # Class ID for 'person' in COCO dataset is 0
+    for box in results.boxes:
+        cls_id = int(box.cls[0])
+        if cls_id == 0: # 0 is person
+            person_count += 1
+            
+            # Draw bounding box (optional, for debugging/visualization if we saved the image)
+            # x1, y1, x2, y2 = box.xyxy[0].tolist()
+            # cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
 
-        if score > threshold:
-            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 4)
-            cv2.putText(frame, yolo_model.names[int(class_id)].upper(), (int(x1), int(y1 - 10)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 3, cv2.LINE_AA)
-        person_count += 1
-         
     return person_count
 
 import sys
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python script_name.py <image_path>")
+        print("Usage: python predictyolo.py <image_path>")
         sys.exit(1)
     
-    image_path = sys.argv[1]  # Receive the path from command-line arguments
-    detect_person_count(image_path)
+    image_path = sys.argv[1]
+    count = detect_person_count(image_path)
+    print(f"People detected: {count}")
